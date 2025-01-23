@@ -83,73 +83,86 @@
   </style>
 </head>
 <body>
-  <h1>Tính Trung Bình Có Trọng Số</h1>
-  <div class="container">
-    <div id="rows-container">
-      <div class="form-group">
-        <input type="number" class="value" placeholder="Điểm (a)">
-        <input type="number" class="weight" placeholder="Trọng số (n)">
-        <button class="remove-row" onclick="removeRow(this)" disabled>Xóa</button>
+    <h1>Tính Trung Bình Có Trọng Số</h1>
+    <div class="container">
+      <div id="rows-container">
+        <div class="form-group">
+          <input type="number" class="value" max="10" placeholder="Điểm (a)" oninput="validateValue(this)" required>
+          <input type="number" class="weight" placeholder="Trọng số (n)" required>
+          <button class="remove-row" onclick="removeRow(this)" disabled>Xóa</button>
+        </div>
       </div>
+      <button class="add-row" onclick="addRow()">Thêm hàng</button>
+      <button class="calculate" onclick="calculateWeightedAverage()">Tính Trung Bình</button>
+      <div id="result" class="result"></div>
     </div>
-    <button class="add-row" onclick="addRow()">Thêm hàng</button>
-    <button class="calculate" onclick="calculateWeightedAverage()">Tính Trung Bình</button>
-    <div id="result" class="result"></div>
-  </div>
-
-  <script>
-    function addRow() {
-      const rowsContainer = document.getElementById("rows-container");
-      const newRow = document.createElement("div");
-      newRow.className = "form-group";
-
-      newRow.innerHTML = `
-        <input type="number" class="value" placeholder="Điểm (a)" required>
-        <input type="number" class="weight" placeholder="Trọng số (n)" required>
-        <button class="remove-row" onclick="removeRow(this)">Xóa</button>
-      `;
-      rowsContainer.appendChild(newRow);
-
-      // Enable "Xóa" buttons
-      const removeButtons = document.querySelectorAll(".remove-row");
-      removeButtons.forEach(button => button.disabled = false);
-    }
-
-    function removeRow(button) {
-      const rowsContainer = document.getElementById("rows-container");
-      if (rowsContainer.children.length > 1) {
-        button.parentElement.remove();
+  
+    <script>
+      function validateValue(input) {
+        // Đảm bảo giá trị nhập không vượt quá 10
+        if (input.value > 10) {
+          input.value = 10;
+        }
       }
-
-      // Nếu chỉ còn 1 hàng, disable "Xóa" button
-      if (rowsContainer.children.length === 1) {
-        document.querySelector(".remove-row").disabled = true;
+  
+      function addRow() {
+        const rowsContainer = document.getElementById("rows-container");
+        const newRow = document.createElement("div");
+        newRow.className = "form-group";
+  
+        newRow.innerHTML = `
+          <input type="number" class="value" max="10" placeholder="Điểm (a)" oninput="validateValue(this)" required>
+          <input type="number" class="weight" placeholder="Trọng số (n)" required>
+          <button class="remove-row" onclick="removeRow(this)">Xóa</button>
+        `;
+        rowsContainer.appendChild(newRow);
+  
+        // Enable "Xóa" buttons
+        const removeButtons = document.querySelectorAll(".remove-row");
+        removeButtons.forEach(button => button.disabled = false);
       }
-    }
-
-    function calculateWeightedAverage() {
-      const values = Array.from(document.querySelectorAll(".value")).map(input => Number(input.value));
-      const weights = Array.from(document.querySelectorAll(".weight")).map(input => Number(input.value));
-
-      // Kiểm tra đầu vào
-      if (values.some(isNaN) || weights.some(isNaN)) {
-        document.getElementById("result").innerText = "Lỗi: Hãy nhập đầy đủ và chính xác các giá trị.";
-        return;
+  
+      function removeRow(button) {
+        const rowsContainer = document.getElementById("rows-container");
+        if (rowsContainer.children.length > 1) {
+          button.parentElement.remove();
+        }
+  
+        // Nếu chỉ còn 1 hàng, disable "Xóa" button
+        if (rowsContainer.children.length === 1) {
+          document.querySelector(".remove-row").disabled = true;
+        }
       }
-
-      const numerator = values.reduce((sum, value, index) => sum + value * weights[index], 0);
-      const denominator = weights.reduce((sum, weight) => sum + weight, 0);
-
-      if (denominator === 0) {
-        document.getElementById("result").innerText = "Lỗi: Tổng trọng số không được bằng 0.";
-        return;
+  
+      function calculateWeightedAverage() {
+        const values = Array.from(document.querySelectorAll(".value")).map(input => Number(input.value));
+        const weights = Array.from(document.querySelectorAll(".weight")).map(input => Number(input.value));
+  
+        // Kiểm tra đầu vào
+        if (values.some(isNaN) || weights.some(isNaN)) {
+          document.getElementById("result").innerText = "Lỗi: Hãy nhập đầy đủ và chính xác các giá trị.";
+          return;
+        }
+  
+        const numerator = values.reduce((sum, value, index) => sum + value * weights[index], 0);
+        const denominator = weights.reduce((sum, weight) => sum + weight, 0);
+  
+        if (denominator === 0) {
+          document.getElementById("result").innerText = "Lỗi: Tổng trọng số không được bằng 0.";
+          return;
+        }
+  
+        const weightedAverage = numerator / denominator;
+  
+        // Quy đổi kết quả sang hệ số 4
+        const convertedScale = (weightedAverage / 10) * 4;
+  
+        // Hiển thị kết quả
+        document.getElementById("result").innerHTML = `
+          <p>Kết quả trung bình có trọng số: <strong>${weightedAverage.toFixed(2)}</strong></p>
+          <p>Kết quả quy đổi sang hệ số 4: <strong>${convertedScale.toFixed(2)}</strong></p>
+        `;
       }
-
-      const result = numerator / denominator;
-
-      // Hiển thị kết quả
-      document.getElementById("result").innerText = `Kết quả trung bình có trọng số: ${result.toFixed(2)}`;
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>
