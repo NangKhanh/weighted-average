@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tính Trung Bình Có Trọng Số</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f4f4f4;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tính Trung Bình Có Trọng Số</h1>
+  <div class="container">
+    <div class="form-group">
+      <label for="values">Nhập giá trị (cách nhau bằng dấu phẩy):</label>
+      <input type="text" id="values" placeholder="Ví dụ: 85, 90, 78">
+    </div>
+    <div class="form-group">
+      <label for="weights">Nhập trọng số (cách nhau bằng dấu phẩy):</label>
+      <input type="text" id="weights" placeholder="Ví dụ: 3, 2, 5">
+    </div>
+    <button onclick="calculateWeightedAverage()">Tính Trung Bình</button>
+    <div id="result" class="result"></div>
+  </div>
+
+  <script>
+    function calculateWeightedAverage() {
+      const valuesInput = document.getElementById("values").value;
+      const weightsInput = document.getElementById("weights").value;
+
+      // Chuyển đổi chuỗi input thành mảng số
+      const values = valuesInput.split(",").map(Number);
+      const weights = weightsInput.split(",").map(Number);
+
+      // Kiểm tra đầu vào
+      if (values.length !== weights.length) {
+        document.getElementById("result").innerText = "Lỗi: Số lượng giá trị và trọng số không khớp.";
+        return;
+      }
+
+      // Tính toán
+      const numerator = values.reduce((sum, value, index) => sum + value * weights[index], 0);
+      const denominator = weights.reduce((sum, weight) => sum + weight, 0);
+
+      if (denominator === 0) {
+        document.getElementById("result").innerText = "Lỗi: Tổng trọng số không được bằng 0.";
+        return;
+      }
+
+      const result = numerator / denominator;
+
+      // Hiển thị kết quả
+      document.getElementById("result").innerText = `Kết quả trung bình có trọng số: ${result.toFixed(2)}`;
+    }
+  </script>
+</body>
+</html>
