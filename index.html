@@ -14,7 +14,7 @@
       color: #333;
     }
     .container {
-      max-width: 500px;
+      max-width: 600px;
       margin: 0 auto;
       padding: 20px;
       border: 1px solid #ccc;
@@ -22,20 +22,43 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
     .form-group {
-      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 20px;
     }
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-    input {
-      width: 100%;
+    .form-group input {
       padding: 8px;
       border: 1px solid #ccc;
       border-radius: 4px;
+      flex: 1;
     }
-    button {
+    .form-group button {
+      margin-left: 10px;
+      padding: 8px 12px;
+      background-color: #ff4d4f;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .form-group button:hover {
+      background-color: #d9363e;
+    }
+    button.add-row {
+      width: 100%;
+      padding: 10px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    button.add-row:hover {
+      background-color: #218838;
+    }
+    button.calculate {
       width: 100%;
       padding: 10px;
       background-color: #007bff;
@@ -43,9 +66,8 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      font-size: 16px;
     }
-    button:hover {
+    button.calculate:hover {
       background-color: #0056b3;
     }
     .result {
@@ -60,34 +82,58 @@
 <body>
   <h1>Tính Trung Bình Có Trọng Số</h1>
   <div class="container">
-    <div class="form-group">
-      <label for="values">Nhập giá trị (cách nhau bằng dấu phẩy):</label>
-      <input type="text" id="values" placeholder="Ví dụ: 85, 90, 78">
+    <div id="rows-container">
+      <div class="form-group">
+        <input type="number" class="value" placeholder="Điểm (a)">
+        <input type="number" class="weight" placeholder="Trọng số (n)">
+        <button class="remove-row" onclick="removeRow(this)" disabled>Xóa</button>
+      </div>
     </div>
-    <div class="form-group">
-      <label for="weights">Nhập trọng số (cách nhau bằng dấu phẩy):</label>
-      <input type="text" id="weights" placeholder="Ví dụ: 3, 2, 5">
-    </div>
-    <button onclick="calculateWeightedAverage()">Tính Trung Bình</button>
+    <button class="add-row" onclick="addRow()">Thêm hàng</button>
+    <button class="calculate" onclick="calculateWeightedAverage()">Tính Trung Bình</button>
     <div id="result" class="result"></div>
   </div>
 
   <script>
-    function calculateWeightedAverage() {
-      const valuesInput = document.getElementById("values").value;
-      const weightsInput = document.getElementById("weights").value;
+    function addRow() {
+      const rowsContainer = document.getElementById("rows-container");
+      const newRow = document.createElement("div");
+      newRow.className = "form-group";
 
-      // Chuyển đổi chuỗi input thành mảng số
-      const values = valuesInput.split(",").map(Number);
-      const weights = weightsInput.split(",").map(Number);
+      newRow.innerHTML = `
+        <input type="number" class="value" placeholder="Điểm (a)" required>
+        <input type="number" class="weight" placeholder="Trọng số (n)" required>
+        <button class="remove-row" onclick="removeRow(this)">Xóa</button>
+      `;
+      rowsContainer.appendChild(newRow);
+
+      // Enable "Xóa" buttons
+      const removeButtons = document.querySelectorAll(".remove-row");
+      removeButtons.forEach(button => button.disabled = false);
+    }
+
+    function removeRow(button) {
+      const rowsContainer = document.getElementById("rows-container");
+      if (rowsContainer.children.length > 1) {
+        button.parentElement.remove();
+      }
+
+      // Nếu chỉ còn 1 hàng, disable "Xóa" button
+      if (rowsContainer.children.length === 1) {
+        document.querySelector(".remove-row").disabled = true;
+      }
+    }
+
+    function calculateWeightedAverage() {
+      const values = Array.from(document.querySelectorAll(".value")).map(input => Number(input.value));
+      const weights = Array.from(document.querySelectorAll(".weight")).map(input => Number(input.value));
 
       // Kiểm tra đầu vào
-      if (values.length !== weights.length) {
-        document.getElementById("result").innerText = "Lỗi: Số lượng giá trị và trọng số không khớp.";
+      if (values.some(isNaN) || weights.some(isNaN)) {
+        document.getElementById("result").innerText = "Lỗi: Hãy nhập đầy đủ và chính xác các giá trị.";
         return;
       }
 
-      // Tính toán
       const numerator = values.reduce((sum, value, index) => sum + value * weights[index], 0);
       const denominator = weights.reduce((sum, weight) => sum + weight, 0);
 
